@@ -92,21 +92,42 @@ if flights_raw:
 
     st.write("**Mark flights as departed:**")
 
+    # for f in flights_list:
+    #     col1, col2 = st.columns([4,1])
+    #     with col1:
+    #         st.write(f"Flight {f['id']} ({f['airline']} - {f['atype']})")
+    #     with col2:
+    #         button_key = f"depart_{f['id']}"
+    #         if st.button("Depart", key=button_key):
+    #             db.delete_flight(f["id"])
+    #             st.session_state.depart_triggered = f["id"]
+    #             st.session_state.refresh += 1
+
+
+    # # Force rerender if a flight was departed
+    # if st.session_state.depart_triggered:
+    #     st.session_state.depart_triggered = None
+    #     st.rerun() if hasattr(st, "experimental_rerun") else None
+
+    st.write("**Mark flights as departed:**")
+
+    departed_flight = None
+
     for f in flights_list:
-        col1, col2 = st.columns([4,1])
+        col1, col2 = st.columns([4, 1])
         with col1:
             st.write(f"Flight {f['id']} ({f['airline']} - {f['atype']})")
         with col2:
             button_key = f"depart_{f['id']}"
             if st.button("Depart", key=button_key):
-                db.delete_flight(f["id"])
-                st.session_state.depart_triggered = f["id"]
-                st.session_state.refresh += 1
+                departed_flight = f["id"]
 
-    # Force rerender if a flight was departed
-    if st.session_state.depart_triggered:
-        st.session_state.depart_triggered = None
-        st.experimental_rerun() if hasattr(st, "experimental_rerun") else None
+    # After the loop, handle departure
+    if departed_flight:
+        db.delete_flight(departed_flight)
+        st.session_state.refresh += 1
+        st.rerun()  # This now runs after the button processing
+
 
 else:
     st.info("No flights added yet.")
