@@ -135,7 +135,14 @@ if st.button("Run Scheduler"):
         st.write(result["status"])
 
         st.subheader("Total Revenue")
-        st.metric("Revenue", f"{result['total_revenue']:.2f}")
+
+        total_revenue = result['total_revenue']
+        if total_revenue is not None:
+            st.metric("Revenue", f"{total_revenue:.2f}")
+        else:
+            # Display a different message if no solution was found
+            st.metric("Revenue", "N/A")
+            st.warning("Solver could not find a valid assignment for any flights.")
 
         st.subheader("Assignments")
         if result["assignments"]:

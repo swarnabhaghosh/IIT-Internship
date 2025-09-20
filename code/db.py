@@ -6,11 +6,12 @@ DB_PATH = "scheduler.db"
 def get_conn():
     return sqlite3.connect(DB_PATH, check_same_thread=False)
 
+#initialize database
 def init_db():
     conn = get_conn()
     c = conn.cursor()
 
-    # Flights table (with composite ID)
+    # Flights table
     c.execute("""
     CREATE TABLE IF NOT EXISTS flights (
         id TEXT PRIMARY KEY,
@@ -51,25 +52,42 @@ def init_db():
     """)
     conn.commit()
 
-    # Initialize defaults if empty
+    # Initialize defaults if tables are empty
     if c.execute("SELECT COUNT(*) FROM bays").fetchone()[0] == 0:
-        for b in ["B1", "B2", "B3"]:
+        bays_to_create = [f"B{i}" for i in range(1, 11)]
+        for b in bays_to_create:
             c.execute("INSERT INTO bays (bay) VALUES (?)", (b,))
         conn.commit()
 
     if c.execute("SELECT COUNT(*) FROM compatibility").fetchone()[0] == 0:
-        comp_data = [
-            ("A320", "B1", 1), ("A320", "B2", 1), ("A320", "B3", 1),
-            ("B737", "B1", 0), ("B737", "B2", 1), ("B737", "B3", 1)
-        ]
+        comp_data = []
+        all_bays = [f"B{i}" for i in range(1, 11)]
+        
+        # Combined loop for efficiency
+        for bay in all_bays:
+            # Rule: A320 is compatible with all 10 bays
+            comp_data.append(("A320", bay, 1))
+            
+            # Rule: B737 is not compatible with B1, but is with the other 9
+            is_compatible = 1 if bay != "B1" else 0
+            comp_data.append(("B737", bay, is_compatible))
+            
         c.executemany("INSERT INTO compatibility (atype, bay, compatible) VALUES (?,?,?)", comp_data)
         conn.commit()
 
     if c.execute("SELECT COUNT(*) FROM revenue").fetchone()[0] == 0:
-        rev_data = [
-            ("AI", "A320", "B1", 100), ("AI", "A320", "B2", 120), ("AI", "A320", "B3", 130),
-            ("BA", "B737", "B2", 150), ("BA", "B737", "B3", 170)
-        ]
+        rev_data = []
+        all_bays = [f"B{i}" for i in range(1, 11)]
+
+        # Rule: AI A320 revenue starts at 100 and increases by 5 for each bay
+        for i, bay in enumerate(all_bays):
+            rev_data.append(("AI", "A320", bay, 100 + i * 5))
+            
+        # Rule: BA B737 revenue (for compatible bays B2-B10) starts at 150
+        for i, bay in enumerate(all_bays):
+            if bay != "B1":
+                rev_data.append(("BA", "B737", bay, 150 + (i - 1) * 5))
+                
         c.executemany("INSERT INTO revenue (airline, atype, bay, amount) VALUES (?,?,?,?)", rev_data)
         conn.commit()
 
@@ -77,10 +95,15 @@ def init_db():
 
 # Flight Operations
 def add_flight(fid, airline, atype, arr: datetime, dep: datetime):
+    airline = airline.strip().upper()
+    atype = atype.strip().upper()
+    fid = fid.strip()
+
+    if not all([fid, airline, atype]):
+        raise ValueError("Flight ID, Airline, and Aircraft Type cannot be empty.")
+
     conn = get_conn()
     c = conn.cursor()
-
-    # Composite key
     flight_key = f"{airline}_{fid}"
 
     exists = c.execute("SELECT 1 FROM flights WHERE id=?", (flight_key,)).fetchone()
@@ -116,13 +139,13 @@ def get_bays():
 
 def get_compatibility():
     conn = get_conn()
-    comp = { (row[0], row[1]): row[2] for row in conn.execute("SELECT atype,bay,compatible FROM compatibility") }
+    comp = {(row[0], row[1]): row[2] for row in conn.execute("SELECT atype,bay,compatible FROM compatibility")}
     conn.close()
     return comp
 
 def get_revenue():
     conn = get_conn()
-    revenue = { (row[0], row[1], row[2]): row[3] for row in conn.execute("SELECT airline,atype,bay,amount FROM revenue") }
+    revenue = {(row[0], row[1], row[2]): row[3] for row in conn.execute("SELECT airline,atype,bay,amount FROM revenue")}
     conn.close()
     return revenue
 
