@@ -32,6 +32,13 @@ It takes all the data and solves the complex puzzle of where to park the planes.
 
 This file creates the **web interface** you see and interact with. It acts as the bridge between you, the database, and the solver.
 
+- **Workflow:**
+
+1. **Display Data**: It calls `db.py` to get the current list of flights and displays them in a table on the screen.
+2. **Get Your Input**: It shows the sidebar form where you can add new flights. When you click "Add Flight", it sends that information to `db.py` to be saved.
+3. **Run the Scheduler**: When you click the "Run Scheduler" button, it wakes up the Chief Strategist (`solver.py`). It gathers all the latest data from the `db.py` file and hands it over to the `solve_assignment` function.
+4. **Show the Results**: It gets the final plan back from the solver and displays the status, total revenue, and the final list of assignments on your screen.
+
 
 Download all the files and then,
 
@@ -46,9 +53,3 @@ go to the code:
 ```
 streamlit run app.py
 ```
-- **Workflow:**
-
-1. **Display Data**: It calls `db.py` to get the current list of flights and displays them in a table on the screen.
-2. **Get Your Input**: It shows the sidebar form where you can add new flights. When you click "Add Flight", it sends that information to `db.py` to be saved.
-3. **Run the Scheduler**: When you click the "Run Scheduler" button, it wakes up the Chief Strategist (`solver.py`). It gathers all the latest data from the `db.py` file and hands it over to the `solve_assignment` function.
-4. **Show the Results**: It gets the final plan back from the solver and displays the status, total revenue, and the final list of assignments on your screen.
