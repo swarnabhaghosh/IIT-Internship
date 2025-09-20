@@ -32,6 +32,20 @@ It takes all the data and solves the complex puzzle of where to park the planes.
 
 This file creates the **web interface** you see and interact with. It acts as the bridge between you, the database, and the solver.
 
+
+Download all the files and then,
+
+in the terminal go to the correct directory :
+
+```
+pip install -r requirements.txt
+```
+
+go to the code:
+
+```
+streamlit run app.py
+```
 - **Workflow:**
 
 1. **Display Data**: It calls `db.py` to get the current list of flights and displays them in a table on the screen.
