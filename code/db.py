@@ -75,9 +75,7 @@ def init_db():
 
     conn.close()
 
-# -------------------------
 # Flight Operations
-# -------------------------
 def add_flight(fid, airline, atype, arr: datetime, dep: datetime):
     conn = get_conn()
     c = conn.cursor()
@@ -109,9 +107,7 @@ def delete_flight(flight_key):
     conn.commit()
     conn.close()
 
-# -------------------------
 # Fetch Other Data
-# -------------------------
 def get_bays():
     conn = get_conn()
     bays = [b[0] for b in conn.execute("SELECT bay FROM bays").fetchall()]
@@ -130,9 +126,7 @@ def get_revenue():
     conn.close()
     return revenue
 
-# -------------------------
 # Reset System
-# -------------------------
 def reset_system():
     conn = get_conn()
     c = conn.cursor()
