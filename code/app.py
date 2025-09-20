@@ -4,15 +4,11 @@ from datetime import datetime
 import db
 from solver import detect_overlaps, solve_assignment
 
-# -------------------------
 # Initialize Streamlit
-# -------------------------
 st.set_page_config(page_title="Aircraft Parking Scheduler", layout="wide")
 st.title("Aircraft Parking Scheduler (DB Version)")
 
-# -------------------------
 # Session State
-# -------------------------
 if "refresh" not in st.session_state:
     st.session_state.refresh = 0
 
@@ -22,14 +18,10 @@ if "reset_trigger" not in st.session_state:
 if "depart_triggered" not in st.session_state:
     st.session_state.depart_triggered = None
 
-# -------------------------
 # Initialize DB
-# -------------------------
 db.init_db()
 
-# -------------------------
 # Add New Flight
-# -------------------------
 st.sidebar.header("Add New Flight")
 with st.sidebar.form("new_flight"):
     fid = st.text_input("Flight Number / ID")
@@ -53,9 +45,7 @@ if submit:
     except Exception as e:
         st.sidebar.error(f"Error: {e}")
 
-# -------------------------
 # Reset System
-# -------------------------
 if st.sidebar.button("Reset System"):
     db.reset_system()
     st.sidebar.success("System reset. All data cleared.")
@@ -67,9 +57,7 @@ if st.session_state.reset_trigger:
 
 _ = st.session_state.refresh  # Force rerender
 
-# -------------------------
 # Current Flights
-# -------------------------
 st.subheader("Current Flights")
 flights_raw = db.get_flights()
 
@@ -132,9 +120,7 @@ if flights_raw:
 else:
     st.info("No flights added yet.")
 
-# -------------------------
 # Run Scheduler
-# -------------------------
 if st.button("Run Scheduler"):
     if not flights_raw:
         st.warning("⚠️ No flights to schedule.")
