@@ -123,7 +123,7 @@ else:
 # Run Scheduler
 if st.button("Run Scheduler"):
     if not flights_raw:
-        st.warning("⚠️ No flights to schedule.")
+        st.warning("No flights to schedule.")
     else:
         bays = db.get_bays()
         comp = db.get_compatibility()
