@@ -39,7 +39,7 @@ This file creates the **web interface** you see and interact with. It acts as th
 3. **Run the Scheduler**: When you click the "Run Scheduler" button, it wakes up the Chief Strategist (`solver.py`). It gathers all the latest data from the `db.py` file and hands it over to the `solve_assignment` function.
 4. **Show the Results**: It gets the final plan back from the solver and displays the status, total revenue, and the final list of assignments on your screen.
 
-
+### How to run : 
 Download all the files and then,
 
 in the terminal go to the correct directory :
